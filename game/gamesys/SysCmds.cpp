@@ -405,6 +405,8 @@ Used by the "give" and "buy" command line cmds
 */
 void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 {
+
+//	gameLocal.Printf("GivingStuffToPlayer: %s \n",name);
 	int			i;
 	bool		give_all;
 //	idPlayer* player = gameLocal.GetLocalPlayer();
@@ -555,6 +557,11 @@ void Cmd_Give_f( const idCmdArgs &args ) {
 }
 // RITUAL END
 
+void Cmd_Widowmaker_f(const idCmdArgs &args){
+
+	gameLocal.Printf("Widowmaker\n");
+	Cmd_Give_f(args);
+}
 /*
 ==================
 Cmd_CenterView_f
@@ -3053,6 +3060,11 @@ void idGameLocal::InitConsoleCommands( void ) {
 //	cmdSystem->AddCommand( "writeGameState",		WriteGameState_f,			CMD_FL_GAME,				"write game state" );
 //	cmdSystem->AddCommand( "testSaveGame",			TestSaveGame_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"test a save game for a level" );
 // RAVEN END
+
+	//My Command
+	cmdSystem->AddCommand("widowmaker", Cmd_Widowmaker_f, CMD_FL_GAME | CMD_FL_CHEAT, "Where is this read lol");
+
+
 	cmdSystem->AddCommand( "game_memory",			idClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
 	cmdSystem->AddCommand( "listClasses",			idClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );
 	cmdSystem->AddCommand( "listThreads",			idThread::ListThreads_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"lists script threads" );

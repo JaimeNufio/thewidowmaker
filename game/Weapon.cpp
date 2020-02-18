@@ -2448,11 +2448,14 @@ rvWeapon::UseAmmo
 ================
 */
 void rvWeapon::UseAmmo ( int amount ) {
+	//WORK
 	owner->inventory.UseAmmo( ammoType, amount * ammoRequired );
 	if ( clipSize && ammoRequired ) {
-		ammoClip -= ( amount * ammoRequired );
-		if ( ammoClip < 0 ) {
-			ammoClip = 0;
+		//ammoClip -= ( amount * ammoRequired );
+		gameLocal.GetLocalPlayer()->inventory.armor-=(amount*ammoRequired);
+		
+		if (gameLocal.GetLocalPlayer()->inventory.armor < 0) {
+			gameLocal.GetLocalPlayer()->inventory.armor = 0;
 		}
 	}
 }
@@ -2474,7 +2477,7 @@ void rvWeapon::AddToClip ( int amount ) {
 		ammoClip = clipSize;
 	}
 
-	ammoAvail = owner->inventory.HasAmmo( ammoType, ammoRequired );
+	ammoAvail = gameLocal.GetLocalPlayer()->inventory.armor;//owner->inventory.HasAmmo( ammoType, ammoRequired );
 	if ( ammoAvail > 0 && ammoClip > ammoAvail ) {
 		ammoClip = ammoAvail;
 	}

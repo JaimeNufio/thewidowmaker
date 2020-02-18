@@ -1026,18 +1026,22 @@ idInventory::HasAmmo
 ===============
 */
 int idInventory::HasAmmo( int index, int amount ) {
-	if ( ( index == 0 ) || !amount ) {
-		// always allow weapons that don't use ammo to fire
-		return -1;
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	int goodToGo = 0;
+	/*if ( ( index == 0 ) || !amount ) {
+			// always allow weapons that don't use ammo to fire
+			return -1;
+		}
+		// check if we have infinite ammo
+		if ( ammo[ index ] < 0 ) {
+			return -1;
+		}*/
+	//RELOADWORK
+	if (player->inventory.armor > 0){//player.inventory.maxarmor){
+		goodToGo = player->inventory.armor;
 	}
 
-	// check if we have infinite ammo
-	if ( ammo[ index ] < 0 ) {
-		return -1;
-	}
-
-	// return how many shots we can fire
-	return ammo[ index ] / amount;
+	return goodToGo; //ammo[ index ] / amount;
 }
 
 /*
@@ -1063,9 +1067,13 @@ bool idInventory::UseAmmo( int index, int amount ) {
 	}
 
 	// take an ammo away if not infinite
-	if ( ammo[ index ] >= 0 ) {
+	/*if ( ammo[ index ] >= 0 ) {
 		ammo[ index ] -= amount;
  		ammoPredictTime = gameLocal.time; // mp client: we predict this. mark time so we're not confused by snapshots
+	}*/
+
+	if (gameLocal.GetLocalPlayer()->inventory.armor > 0){
+		gameLocal.GetLocalPlayer()->inventory.armor-=amount;
 	}
 
 	return true;
@@ -8953,6 +8961,7 @@ idPlayer::Move
 ==============
 */
 void idPlayer::Move( void ) {
+//	gameLocal.Printf("Moving\n");
 	float newEyeOffset;
 	idVec3 oldOrigin;
 	idVec3 oldVelocity;
@@ -10067,6 +10076,10 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
  	idVec3		damage_from;
  	float		attackerPushScale;
 
+	//if (attacker == this){
+	//	printf("Player hit something.\n");
+	//}
+
 	// RAVEN BEGIN
 	// twhitaker: difficulty levels
 	float modifiedDamageScale = damageScale;
@@ -10117,6 +10130,9 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 		if ( attacker->IsType ( idActor::GetClassType() ) && static_cast<idActor*>(attacker)->team == team ) {
 			return;
 		}
+	}
+
+	if (inflictor == this){
 	}
 
 	const idDeclEntityDef *damageDef = gameLocal.FindEntityDef( damageDefName, false );

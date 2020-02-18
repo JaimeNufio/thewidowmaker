@@ -7529,6 +7529,8 @@ idEntity* idGameLocal::HitScan(
 	int				areas[ 2 ]
 	) {
 
+	//gameLocal.Printf("Shot fired!");
+
 	idVec3		dir;
 	idVec3		origin;
 	idVec3		fxOrigin;
@@ -7547,6 +7549,11 @@ idEntity* idGameLocal::HitScan(
 
 	ignore    = owner;
 	penetrate = hitscanDict.GetFloat( "penetrate" );
+
+	if (owner->IsType(idPlayer::GetClassType())){
+		gameLocal.Printf("Player Fire.\n"); //TODO handle slugs...
+	}
+	
 
 	if( hitscanDict.GetBool( "hitscanTint" ) && owner->IsType( idPlayer::GetClassType() ) ) {
 		hitscanTint = ((idPlayer*)owner)->GetHitscanTint();
@@ -7682,17 +7689,17 @@ idEntity* idGameLocal::HitScan(
 			if ( ent->fl.takedamage && ent->GetTeamMaster( ) && ent->GetTeamMaster( )->IsType ( idActor::GetClassType() ) ) {
 				actualHitEnt = ent;
 				ent = ent->GetTeamMaster( );
+			//	gameLocal.Printf("Hit an entity.\n");
 			}
 
 			if ( !gameLocal.isClient ) {
-
 				// Apply force to the entity that was hit
 				ent->ApplyImpulse( owner, tr.c.id, tr.c.point, -tr.c.normal, &hitscanDict );
 
 				// Handle damage to the entity
+				//FlagDamage
 				if ( ent->fl.takedamage && !(( tr.c.material != NULL ) && ( tr.c.material->GetSurfaceFlags() & SURF_NODAMAGE )) ) {		
 					const char*	damage;
-				
 					damage    = NULL;
 
 					// RAVEN BEGIN
@@ -7728,6 +7735,7 @@ idEntity* idGameLocal::HitScan(
 						}
 						// RAVEN END
 						ent->Damage( owner, owner, dir, damage, damageScale, hitJoint );
+					//	gameLocal.Printf("Did damage to an entity. (is this only from the player?)\n");
 					}
 
 					// Let the entity add its own damage effect
@@ -7749,6 +7757,7 @@ idEntity* idGameLocal::HitScan(
 								damage = hitscanDict.GetString ( "def_damage" );
 							}
 							if ( damage && damage[0] ) {
+							//	gameLocal.Printf("Apply damage to 'ActualHitEntity'\n");
 								actualHitEnt->Damage( owner, owner, dir, damage, damageScale, CLIPMODEL_ID_TO_JOINT_HANDLE( tr.c.id ) );
 							}
 						}
