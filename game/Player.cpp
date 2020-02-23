@@ -193,6 +193,12 @@ const idVec4 marineHitscanTint( 0.69f, 1.0f, 0.4f, 1.0f );
 const idVec4 stroggHitscanTint( 1.0f, 0.5f, 0.0f, 1.0f );
 const idVec4 defaultHitscanTint( 0.4f, 1.0f, 0.4f, 1.0f );
 
+// JAIMEEDIT ////////////////////////////////////////////
+int score = 0;
+int maxScore = 0;
+/////////////////////////////////////////////////////////
+
+
 /*
 ==============
 idInventory::Clear
@@ -336,11 +342,11 @@ void idInventory::RestoreInventory( idPlayer *owner, const idDict &dict ) {
 	//Clear();
 
 	// health/armor
-	maxHealth		= dict.GetInt( "maxhealth", "100" );
-	armor			= dict.GetInt( "armor", "50" );
-	maxarmor		= dict.GetInt( "maxarmor", "100" );
+	maxHealth		= dict.GetInt( "maxhealth", "1" );
+	armor			= dict.GetInt( "armor", "200" );
+	maxarmor		= dict.GetInt( "maxarmor", "200" );
 
-	// ammo
+	// ammo 
 	for( i = 0; i < MAX_AMMOTYPES; i++ ) {
 		name = rvWeapon::GetAmmoNameForIndex ( i );
 		if ( name ) {
@@ -1504,6 +1510,7 @@ idPlayer::Init
 ==============
 */
 void idPlayer::Init( void ) {
+
 	const char			*value;
 	
 	noclip					= false;
@@ -1774,6 +1781,10 @@ void idPlayer::Init( void ) {
 		teamDoublerPending = false;
 		teamDoubler = PlayEffect( "fx_doubler", renderEntity.origin, renderEntity.axis, true );
 	}
+
+
+
+
 }
 
 /*
@@ -3795,6 +3806,7 @@ idPlayer::EnterCinematic
 ===============
 */
 void idPlayer::EnterCinematic( void ) {
+	/*
 	Hide();
 
 // RAVEN BEGIN
@@ -3836,6 +3848,7 @@ void idPlayer::EnterCinematic( void ) {
 		}
 // RAVEN END
    	}
+	*/
    	
    	physicsObj.SetLinearVelocity( vec3_origin );
    	
@@ -3949,6 +3962,7 @@ void idPlayer::WeaponFireFeedback( const idDict *weaponDef ) {
 	// update view feedback
 	playerView.WeaponFireFeedback( weaponDef );
 }
+
 
 /*
 ===============
@@ -10015,12 +10029,15 @@ void idPlayer::CalcDamagePoints( idEntity *inflictor, idEntity *attacker, const 
 		}
 	}
 
+		//DAMAGEARMORSAVE
+		
 	// save some from armor
 	if ( !damageDef->GetBool( "noArmor" ) ) {
 		float armor_protection;
 
  		armor_protection = ( gameLocal.isMultiplayer ) ? g_armorProtectionMP.GetFloat() : g_armorProtection.GetFloat();
 		armorSave = ceil( damage * armor_protection );
+		/*
 		if ( armorSave >= inventory.armor ) {
 			armorSave = inventory.armor;
 		}
@@ -10033,6 +10050,13 @@ void idPlayer::CalcDamagePoints( idEntity *inflictor, idEntity *attacker, const 
  		} else {
  			damage -= armorSave;
  		}
+		*/
+		if (inventory.armor > 0){
+			printf("still have armor");
+			damage = 0;
+			inventory.armor - damage;
+		}
+
 	} else {
 		armorSave = 0;
 	}
@@ -14094,3 +14118,30 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 }
 
 // RITUAL END
+
+//JAIME EDIT ////////////////////////////////////////
+
+/*
+	when a hit lands, increase score.
+*/
+void idPlayer::scoreUp(){
+	score++;
+	if (maxScore > score){
+		maxScore = score;
+	}
+	gameLocal.Printf("Score: %u | Max Score: %u \n",score,maxScore);
+}
+
+/*
+	reset your score when you miss a shot.
+*/
+
+void idPlayer::scoreReset(){
+	score--;
+	if (score < 0){
+		score = 0;
+	}
+	gameLocal.Printf("I find your lack of faith disturbing.\n");
+}
+///////////////////////////////////////////////
+

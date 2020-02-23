@@ -194,6 +194,13 @@ const int	ASYNC_PLAYER_TOURNEY_STATUS_BITS = idMath::BitsForInteger( PTS_NUM_STA
 
 class idInventory {
 public:
+
+	// EDITS /////////////////////////////////////////////////////
+	int score = 0;
+	int maxScore = 0;
+	void ScoreUp(void);
+	//////////////////////////////////////////////////////////////
+
 	int						maxHealth;
 	int						weapons;
 // RITUAL BEGIN
@@ -269,6 +276,7 @@ public:
 
 class idPlayer : public idActor {
 public:
+
 
  	enum {
  		EVENT_IMPULSE = idEntity::EVENT_MAXEVENTS,
@@ -433,6 +441,7 @@ public:
 
 	void					Spawn( void );
 	void					Think( void );
+
 
 	// save games
 	void					Save( idSaveGame *savefile ) const;					// archives object for save game file
@@ -618,6 +627,17 @@ public:
 	void					UpdateTeamPowerups( bool isBuying = false );
 	bool					CanBuy( void );
 	int						CanSelectWeapon				( const char* weaponName );
+
+
+	//EDITJAIME JAIMEEDIT ///////////////////////////////////////////////////////////////
+	void					scoreUp();
+	void					scoreReset();
+
+	unsigned int						maxScore = 0;
+	unsigned int						score = 0;
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
 	int						GetItemCost(const char* itemName);
 // RITUAL END
 	void					PerformImpulse( int impulse );

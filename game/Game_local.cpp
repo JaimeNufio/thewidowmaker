@@ -7550,10 +7550,11 @@ idEntity* idGameLocal::HitScan(
 	ignore    = owner;
 	penetrate = hitscanDict.GetFloat( "penetrate" );
 
+	/*
 	if (owner->IsType(idPlayer::GetClassType())){
 		gameLocal.Printf("Player Fire.\n"); //TODO handle slugs...
 	}
-	
+	*/
 
 	if( hitscanDict.GetBool( "hitscanTint" ) && owner->IsType( idPlayer::GetClassType() ) ) {
 		hitscanTint = ((idPlayer*)owner)->GetHitscanTint();
@@ -7691,6 +7692,12 @@ idEntity* idGameLocal::HitScan(
 				ent = ent->GetTeamMaster( );
 			//	gameLocal.Printf("Hit an entity.\n");
 			}
+			else{
+				if (owner->IsType(idPlayer::GetClassType())){
+					gameLocal.Printf("Miss!\n");
+					gameLocal.GetLocalPlayer()->scoreReset();
+				}
+			}
 
 			if ( !gameLocal.isClient ) {
 				// Apply force to the entity that was hit
@@ -7733,8 +7740,17 @@ idEntity* idGameLocal::HitScan(
 						if( owner->IsType( idPlayer::GetClassType() ) && ent->IsType( idActor::GetClassType() ) && ent != owner && !((idPlayer*)owner)->pfl.dead ) {
 							statManager->WeaponHit( (idActor*)owner, ent, ((idPlayer*)owner)->GetCurrentWeapon() );
 						}
+
+						//JAIMEEDIT EDITJAIME
+						if (owner->IsType(idPlayer::GetClassType())){
+							gameLocal.Printf("Great kid! don't get cocky kid!\n"); //TODO handle slugs...
+							gameLocal.GetLocalPlayer()->inventory.armor++;
+							gameLocal.GetLocalPlayer()->scoreUp();
+						}
+
 						// RAVEN END
 						ent->Damage( owner, owner, dir, damage, damageScale, hitJoint );
+
 					//	gameLocal.Printf("Did damage to an entity. (is this only from the player?)\n");
 					}
 
@@ -7774,9 +7790,23 @@ idEntity* idGameLocal::HitScan(
 				additionalIgnore = ent;
 				damageScale *= penetrate;
 				continue;
+			}else{
+				/*
+					//JAIMEEDIT EDITJAIME
+				if ((damage == 0 || damage == null ) && owner->IsType(idPlayer::GetClassType())){
+					gameLocal.Printf("player miss\n"); //TODO handle slugs...
+					gameLocal.GetLocalPlayer()->inventory.armor++;
+					gameLocal.GetLocalPlayer()->scoreUp();
+				}
+				*/
+
+				//gameLocal.Printf("Miss?/n");
+
 			}
 			break;
 		}
+
+		//end of loop.
 			
 		// Path effect 
 		fxDir = collisionPoint - fxOrigin;
@@ -7833,9 +7863,13 @@ idEntity* idGameLocal::HitScan(
 
 		// Increase damage scale on reflect		
 		damageScale += hitscanDict.GetFloat( "reflect_powerup", "0" );
+
+
 	}	
 	
+
 	assert( false );
+
 	
 	return NULL;
 }

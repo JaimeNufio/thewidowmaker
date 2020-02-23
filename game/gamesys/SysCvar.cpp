@@ -171,8 +171,8 @@ idCVar g_debugState(				"g_debugState",				"0",			CVAR_GAME, "" );
 idCVar g_stopTime(					"g_stopTime",				"0",			CVAR_GAME | CVAR_BOOL, "" );
 //idCVar g_damageScale(				"g_damageScale",			"1",			CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "scale final damage on player by this factor" );
 // RAVEN END									   
-idCVar g_armorProtection(			"g_armorProtection",		"0.66667",			CVAR_GAME | CVAR_FLOAT | PC_CVAR_ARCHIVE, "armor takes this percentage of damage" );
-idCVar g_armorProtectionMP(			"g_armorProtectionMP",		"0.66667",		CVAR_GAME | CVAR_FLOAT | PC_CVAR_ARCHIVE, "armor takes this percentage of damage in mp" );
+idCVar g_armorProtection(			"g_armorProtection",		"1",			CVAR_GAME | CVAR_FLOAT | PC_CVAR_ARCHIVE, "armor takes this percentage of damage" );
+idCVar g_armorProtectionMP(			"g_armorProtectionMP",		"1",		CVAR_GAME | CVAR_FLOAT | PC_CVAR_ARCHIVE, "armor takes this percentage of damage in mp" );
 idCVar g_useDynamicProtection(		"g_useDynamicProtection",	"1",			CVAR_GAME | CVAR_BOOL | PC_CVAR_ARCHIVE, "scale damage and armor dynamically to keep the player alive more often" );
 idCVar g_healthTakeTime(			"g_healthTakeTime",			"5",			CVAR_GAME | CVAR_INTEGER | PC_CVAR_ARCHIVE, "how often to take health in nightmare mode" );
 idCVar g_healthTakeAmt(				"g_healthTakeAmt",			"5",			CVAR_GAME | CVAR_INTEGER | PC_CVAR_ARCHIVE, "how much health to take in nightmare mode" );
