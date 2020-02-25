@@ -196,9 +196,12 @@ class idInventory {
 public:
 
 	// EDITS /////////////////////////////////////////////////////
-	int score = 0;
-	int maxScore = 0;
-	void ScoreUp(void);
+	unsigned int score = 0;
+	unsigned int maxScore = 0;
+	unsigned int countHits = 0; //hitscans processed
+	unsigned int countLanded = 0;
+
+	void handleHit(bool landed);
 	//////////////////////////////////////////////////////////////
 
 	int						maxHealth;
@@ -632,9 +635,6 @@ public:
 	//EDITJAIME JAIMEEDIT ///////////////////////////////////////////////////////////////
 	void					scoreUp();
 	void					scoreReset();
-
-	unsigned int						maxScore = 0;
-	unsigned int						score = 0;
 
 	/////////////////////////////////////////////////////////////////////////////////////
 

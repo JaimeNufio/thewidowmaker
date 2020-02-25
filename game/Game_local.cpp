@@ -7694,8 +7694,8 @@ idEntity* idGameLocal::HitScan(
 			}
 			else{
 				if (owner->IsType(idPlayer::GetClassType())){
-					gameLocal.Printf("Miss!\n");
-					gameLocal.GetLocalPlayer()->scoreReset();
+					//gameLocal.Printf("Miss!\n");
+					gameLocal.GetLocalPlayer()->inventory.handleHit(false);
 				}
 			}
 
@@ -7743,9 +7743,10 @@ idEntity* idGameLocal::HitScan(
 
 						//JAIMEEDIT EDITJAIME
 						if (owner->IsType(idPlayer::GetClassType())){
-							gameLocal.Printf("Great kid! don't get cocky kid!\n"); //TODO handle slugs...
-							gameLocal.GetLocalPlayer()->inventory.armor++;
-							gameLocal.GetLocalPlayer()->scoreUp();
+							//gameLocal.Printf("Great kid! don't get cocky kid!\n"); //TODO handle slugs...
+							//gameLocal.GetLocalPlayer()->inventory.armor++;
+							//gameLocal.GetLocalPlayer()->inventory.score();
+							gameLocal.GetLocalPlayer()->inventory.handleHit(true);
 						}
 
 						// RAVEN END

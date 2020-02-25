@@ -193,10 +193,7 @@ const idVec4 marineHitscanTint( 0.69f, 1.0f, 0.4f, 1.0f );
 const idVec4 stroggHitscanTint( 1.0f, 0.5f, 0.0f, 1.0f );
 const idVec4 defaultHitscanTint( 0.4f, 1.0f, 0.4f, 1.0f );
 
-// JAIMEEDIT ////////////////////////////////////////////
-int score = 0;
-int maxScore = 0;
-/////////////////////////////////////////////////////////
+
 
 
 /*
@@ -205,6 +202,8 @@ idInventory::Clear
 ==============
 */
 void idInventory::Clear( void ) {
+
+
 	maxHealth			= 0;
 	weapons				= 0;
 	carryOverWeapons	= 0;
@@ -14121,27 +14120,39 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 
 //JAIME EDIT ////////////////////////////////////////
 
-/*
-	when a hit lands, increase score.
-*/
-void idPlayer::scoreUp(){
-	score++;
-	if (maxScore > score){
-		maxScore = score;
+void idInventory::handleHit(bool landed){
+
+	int ammoReq = gameLocal.GetLocalPlayer()->weapon->ammoRequired;
+	countHits++;
+	if (landed){
+		countLanded++;
 	}
-	gameLocal.Printf("Score: %u | Max Score: %u \n",score,maxScore);
+
+	if (countHits >= ammoReq){
+		if (countLanded > 0){
+			gameLocal.Printf("Don't get cocky kid! \n");
+			score++;
+		}
+		else{
+			gameLocal.Printf("Stoomtrooper shit. \n");
+			score = 0;
+		}
+		gameLocal.Printf("Reward: %d\n", countLanded);
+
+		if (score > maxScore){
+			maxScore = score;
+		}
+
+		gameLocal.GetLocalPlayer()->inventory.armor = gameLocal.GetLocalPlayer()->inventory.armor + countLanded;
+
+		countHits = 0;
+		countLanded = 0;
+
+		gameLocal.Printf("Score: %d | Max-Score: %d\n",score,maxScore);
+	}
+	
 }
 
-/*
-	reset your score when you miss a shot.
-*/
 
-void idPlayer::scoreReset(){
-	score--;
-	if (score < 0){
-		score = 0;
-	}
-	gameLocal.Printf("I find your lack of faith disturbing.\n");
-}
 ///////////////////////////////////////////////
 
