@@ -1058,7 +1058,7 @@ int idInventory::HasAmmo( const char *weapon_classname ) {
 	int ammoRequired;
 	int index;
 	index = AmmoIndexForWeaponClass( weapon_classname, &ammoRequired );
-	return HasAmmo( index, ammoRequired );
+	return HasAmmo(index, ammoRequired*(1 - gameLocal.GetLocalPlayer()->inventory.ammoDiscount));
 }
 
 /*
@@ -1078,7 +1078,7 @@ bool idInventory::UseAmmo( int index, int amount ) {
 	}*/
 
 	if (gameLocal.GetLocalPlayer()->inventory.armor > 0){
-		gameLocal.GetLocalPlayer()->inventory.armor-=amount;
+		gameLocal.GetLocalPlayer()->inventory.armor-=floor(amount*(1-gameLocal.GetLocalPlayer()->inventory.ammoDiscount));
 	}
 
 	return true;
@@ -3410,6 +3410,23 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	
 	assert ( _hud );
 
+	//sloppy fucking redudent code, but hey.
+
+	char buff[32];
+	int integer = gameLocal.GetLocalPlayer()->inventory.level;
+	sprintf_s(buff, "Level:\t%d", integer);
+	_hud->SetStateString("player_level_jaime", buff);
+
+	memset(buff, 0, sizeof(buff));
+	integer = gameLocal.GetLocalPlayer()->inventory.score;
+	sprintf_s(buff, "Score:\t%d", integer);
+	_hud->SetStateString("player_score_jaime",buff);
+
+	memset(buff, 0, sizeof(buff));
+	integer = gameLocal.GetLocalPlayer()->inventory.maxScore;
+	sprintf_s(buff, "Highscore:\t%d", integer);
+	_hud->SetStateString("player_hscore_jaime", buff);
+
 	temp = _hud->State().GetInt ( "player_health", "-1" );
 	if ( temp != health ) {		
 		_hud->SetStateInt   ( "player_healthDelta", temp == -1 ? 0 : (temp - health) );
@@ -3549,6 +3566,8 @@ void idPlayer::UpdateHudWeapon( int displayWeapon ) {
 	if ( w ) {
 		idStr langToken = w->dict.GetString( "inv_name" );
 		hud->SetStateString( "weaponname", common->GetLocalizedString( langToken ) );
+		//JAIMEEDIT EDITJAIME
+		//gui::weaponname
 	}
 
 	UpdateHudAmmo( hud );
@@ -14121,6 +14140,7 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 //JAIME EDIT ////////////////////////////////////////
 
 void idInventory::handleHit(bool landed){
+	//gui::player_buffs_jaime
 
 	int ammoReq = gameLocal.GetLocalPlayer()->weapon->ammoRequired;
 	countHits++;
@@ -14143,7 +14163,39 @@ void idInventory::handleHit(bool landed){
 			maxScore = score;
 		}
 
-		gameLocal.GetLocalPlayer()->inventory.armor = gameLocal.GetLocalPlayer()->inventory.armor + countLanded;
+		level = (score / (5.0f)) + 1;
+
+		switch (level){
+			case 1:
+				pm_speed.SetFloat(160.0f);
+				gameLocal.GetLocalPlayer()->inventory.reward = 1.1;
+				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0;
+				pm_jumpheight.SetFloat(48.0f);
+			case 2:
+				pm_speed.SetFloat(180.0f);
+				gameLocal.GetLocalPlayer()->inventory.reward = 1.3;
+				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0.1;
+				pm_jumpheight.SetFloat(60.0f);
+			case 3:
+				pm_speed.SetFloat(200.0f);
+				gameLocal.GetLocalPlayer()->inventory.reward = 1.5;
+				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0.2;
+				pm_jumpheight.SetFloat(80.0f);
+			case 4:
+				pm_speed.SetFloat(220.0f);
+				gameLocal.GetLocalPlayer()->inventory.reward = 1.7;
+				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0.3;
+				pm_jumpheight.SetFloat(100.0f);
+			case 5:
+				pm_speed.SetFloat(240.0f);
+				gameLocal.GetLocalPlayer()->inventory.reward = 2;
+				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0.45;
+				pm_jumpheight.SetFloat(120.0f);
+			default:
+				break;
+		}
+
+		gameLocal.GetLocalPlayer()->inventory.armor = gameLocal.GetLocalPlayer()->inventory.armor + countLanded*gameLocal.GetLocalPlayer()->inventory.reward;
 
 		countHits = 0;
 		countLanded = 0;
