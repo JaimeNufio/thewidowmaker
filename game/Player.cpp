@@ -3376,6 +3376,7 @@ void idPlayer::UpdateHudAmmo( idUserInterface *_hud ) {
 	inclip		= weapon->AmmoInClip();
 	ammoamount	= weapon->AmmoAvailable();
 
+
 	if ( ammoamount < 0 ) {
 		// show infinite ammo
 		_hud->SetStateString( "player_ammo", "-1" );
@@ -3410,10 +3411,8 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	
 	assert ( _hud );
 
-	//sloppy fucking redudent code, but hey.
-
-	char buff[32];
-	int integer = gameLocal.GetLocalPlayer()->inventory.level;
+	char buff[500];
+	int integer = gameLocal.GetLocalPlayer()->inventory.level+1;
 	sprintf_s(buff, "Level:\t%d", integer);
 	_hud->SetStateString("player_level_jaime", buff);
 
@@ -3427,12 +3426,28 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	sprintf_s(buff, "Highscore:\t%d", integer);
 	_hud->SetStateString("player_hscore_jaime", buff);
 
+	//gui::player_buffs_jaime
+	memset(buff, 0, sizeof(buff));
+	integer = gameLocal.GetLocalPlayer()->inventory.maxScore;
+	sprintf_s(buff, "Speed: %4.2f Bullet Return: %4.2f ",//Ammo Discount: %.2f Jump Height: %.2f", 
+		(150.0f + (15 * gameLocal.GetLocalPlayer()->inventory.level)) / 150.0f,
+		(1.1f + (.2*gameLocal.GetLocalPlayer()->inventory.level)) / 1.1f);
+	//	(0 + (.1f*gameLocal.GetLocalPlayer()->inventory.level)),
+	//	(48.0f + (20 * gameLocal.GetLocalPlayer()->inventory.level))/48.0f);
+	_hud->SetStateString("player_buffs_jaime1", buff);
+
+	sprintf_s(buff, "Ammo Discount: %4.2f Jump Height: %4.2f", 
+		(0 + (.1f*gameLocal.GetLocalPlayer()->inventory.level)),
+		(48.0f + (20 * gameLocal.GetLocalPlayer()->inventory.level)) / 48.0f);
+	_hud->SetStateString("player_buffs_jaime", buff);
+
+
 	temp = _hud->State().GetInt ( "player_health", "-1" );
 	if ( temp != health ) {		
-		_hud->SetStateInt   ( "player_healthDelta", temp == -1 ? 0 : (temp - health) );
-		_hud->SetStateInt	( "player_health", health < -100 ? -100 : health );
-		_hud->SetStateFloat	( "player_healthpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)health / (float)inventory.maxHealth ) );
-		_hud->HandleNamedEvent ( "updateHealth" );
+	//	_hud->SetStateInt   ( "player_healthDelta", temp == -1 ? 0 : (temp - health) );
+	//	_hud->SetStateInt	( "player_health", health < -100 ? -100 : health );
+	//	_hud->SetStateFloat	( "player_healthpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)health / (float)inventory.maxHealth ) );
+	//	_hud->HandleNamedEvent ( "updateHealth" );
 	}
 		
 	temp = _hud->State().GetInt ( "player_armor", "-1" );
@@ -14157,43 +14172,18 @@ void idInventory::handleHit(bool landed){
 			gameLocal.Printf("Stoomtrooper shit. \n");
 			score = 0;
 		}
-		gameLocal.Printf("Reward: %d\n", countLanded);
+		gameLocal.Printf("Reward: %5d\n", countLanded);
 
 		if (score > maxScore){
 			maxScore = score;
 		}
 
-		level = (score / (5.0f)) + 1;
+		level = (score / (5.0f));
 
-		switch (level){
-			case 1:
-				pm_speed.SetFloat(160.0f);
-				gameLocal.GetLocalPlayer()->inventory.reward = 1.1;
-				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0;
-				pm_jumpheight.SetFloat(48.0f);
-			case 2:
-				pm_speed.SetFloat(180.0f);
-				gameLocal.GetLocalPlayer()->inventory.reward = 1.3;
-				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0.1;
-				pm_jumpheight.SetFloat(60.0f);
-			case 3:
-				pm_speed.SetFloat(200.0f);
-				gameLocal.GetLocalPlayer()->inventory.reward = 1.5;
-				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0.2;
-				pm_jumpheight.SetFloat(80.0f);
-			case 4:
-				pm_speed.SetFloat(220.0f);
-				gameLocal.GetLocalPlayer()->inventory.reward = 1.7;
-				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0.3;
-				pm_jumpheight.SetFloat(100.0f);
-			case 5:
-				pm_speed.SetFloat(240.0f);
-				gameLocal.GetLocalPlayer()->inventory.reward = 2;
-				gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0.45;
-				pm_jumpheight.SetFloat(120.0f);
-			default:
-				break;
-		}
+		pm_speed.SetFloat(150.0f+(15*level));
+		gameLocal.GetLocalPlayer()->inventory.reward = 1.1f+(.2*level);
+		gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0+(.1f*level);
+		pm_jumpheight.SetFloat(48.0f+(20*level));
 
 		gameLocal.GetLocalPlayer()->inventory.armor = gameLocal.GetLocalPlayer()->inventory.armor + countLanded*gameLocal.GetLocalPlayer()->inventory.reward;
 

@@ -3667,6 +3667,7 @@ idAI::
 */
 
 void idAI::OnDeath( void ){
+	gameLocal.Printf("Dead.");
 	if( vehicleController.IsDriving() ){
 		usercmd_t				usercmd;
 

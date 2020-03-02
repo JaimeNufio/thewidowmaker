@@ -7741,11 +7741,7 @@ idEntity* idGameLocal::HitScan(
 							statManager->WeaponHit( (idActor*)owner, ent, ((idPlayer*)owner)->GetCurrentWeapon() );
 						}
 
-						//JAIMEEDIT EDITJAIME
 						if (owner->IsType(idPlayer::GetClassType())){
-							//gameLocal.Printf("Great kid! don't get cocky kid!\n"); //TODO handle slugs...
-							//gameLocal.GetLocalPlayer()->inventory.armor++;
-							//gameLocal.GetLocalPlayer()->inventory.score();
 							gameLocal.GetLocalPlayer()->inventory.handleHit(true);
 						}
 
