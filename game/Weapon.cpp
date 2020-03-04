@@ -655,6 +655,7 @@ void rvWeapon::Spawn ( void ) {
 	// Ammo
 	clipSize			= spawnArgs.GetInt( "clipSize" );
 	ammoRequired		= spawnArgs.GetInt( "ammoRequired" );
+	hitscans = spawnArgs.GetInt("hitscans");
 	lowAmmo				= spawnArgs.GetInt( "lowAmmo" );
 	ammoType			= GetAmmoIndexForName( spawnArgs.GetString( "ammoType" ) );
 	maxAmmo				= owner->inventory.MaxAmmoForAmmoClass ( owner, GetAmmoNameForIndex ( ammoType ) );
@@ -2416,6 +2417,10 @@ rvWeapon::AmmoRequired
 */
 int	rvWeapon::AmmoRequired( void ) const {
 	return ammoRequired;
+}
+
+int rvWeapon::HitScans(void) const{
+	return hitscans;
 }
 
 /*

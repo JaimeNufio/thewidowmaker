@@ -14155,10 +14155,11 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 //JAIME EDIT ////////////////////////////////////////
 
 void idInventory::handleHit(bool landed){
-	//gui::player_buffs_jaime
 
 	int ammoReq = gameLocal.GetLocalPlayer()->weapon->ammoRequired;
 	countHits++;
+	gameLocal.Printf("Handle Hit #%d Landed: %s \n", countHits,landed?"true":"false");
+
 	if (landed){
 		countLanded++;
 	}
@@ -14181,7 +14182,7 @@ void idInventory::handleHit(bool landed){
 		level = (score / (5.0f));
 
 		pm_speed.SetFloat(150.0f+(15*level));
-		gameLocal.GetLocalPlayer()->inventory.reward = 1.1f+(.2*level);
+		gameLocal.GetLocalPlayer()->inventory.reward = 2.0f+(.2*level);
 		gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0+(.1f*level);
 		pm_jumpheight.SetFloat(48.0f+(20*level));
 

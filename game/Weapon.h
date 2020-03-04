@@ -203,6 +203,7 @@ public:
 	int					ClipSize					( void ) const;
 	int					LowAmmo						( void ) const;
 	int					AmmoRequired				( void ) const;
+	int					HitScans					(void) const;
 	void				AddToClip					( int amount );
 	void				UseAmmo						( int amount );
 	void				SetClip						( int amount );
@@ -335,7 +336,7 @@ public:
 	int								altFireRate;
 	float							spread;
 	int								nextAttackTime;
-
+	int hitscans;
 	// we maintain local copies of the projectile and brass dictionaries so they
 	// do not have to be copied across the DLL boundary when entities are spawned
 	idDict							attackAltDict;
