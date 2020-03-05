@@ -201,6 +201,7 @@ public:
 	unsigned int countHits = 0; //hitscans processed
 	unsigned int countLanded = 0;
 	unsigned int level = 0;
+	unsigned int tickTimer = 0;
 	float reward = 1.5f;
 	float ammoDiscount = 0;
 

@@ -3426,18 +3426,30 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	sprintf_s(buff, "Highscore:\t%d", integer);
 	_hud->SetStateString("player_hscore_jaime", buff);
 
+	/*
+	
+	level = (score / (5.0f));
+
+	pm_speed.SetFloat(150.0f+(15*level));
+	gameLocal.GetLocalPlayer()->inventory.reward = 2.0f+(.2*level);
+	gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0+(.1f*level);
+	pm_jumpheight.SetFloat(48.0f+(20*level));
+
+	
+	*/
+
 	//gui::player_buffs_jaime
 	memset(buff, 0, sizeof(buff));
 	integer = gameLocal.GetLocalPlayer()->inventory.maxScore;
 	sprintf_s(buff, "Speed: %4.2f Bullet Return: %4.2f ",//Ammo Discount: %.2f Jump Height: %.2f", 
 		(150.0f + (15 * gameLocal.GetLocalPlayer()->inventory.level)) / 150.0f,
-		(1.1f + (.2*gameLocal.GetLocalPlayer()->inventory.level)) / 1.1f);
+		(gameLocal.GetLocalPlayer()->inventory.reward));
 	//	(0 + (.1f*gameLocal.GetLocalPlayer()->inventory.level)),
 	//	(48.0f + (20 * gameLocal.GetLocalPlayer()->inventory.level))/48.0f);
 	_hud->SetStateString("player_buffs_jaime1", buff);
 
 	sprintf_s(buff, "Ammo Discount: %4.2f Jump Height: %4.2f", 
-		(0 + (.1f*gameLocal.GetLocalPlayer()->inventory.level)),
+		(0 + (.1f*gameLocal.GetLocalPlayer()->inventory.ammoDiscount)),
 		(48.0f + (20 * gameLocal.GetLocalPlayer()->inventory.level)) / 48.0f);
 	_hud->SetStateString("player_buffs_jaime", buff);
 
@@ -9007,7 +9019,34 @@ void idPlayer::GetAASLocation( idAAS *aas, idVec3 &pos, int &areaNum ) const {
 idPlayer::Move
 ==============
 */
+int temp = 50;
 void idPlayer::Move( void ) {
+
+
+	temp--;
+	if (temp <= 0){
+		inventory.armor -= inventory.level+1;
+		temp = 50;
+	}
+
+	if (inventory.tickTimer>0){
+		gameLocal.Printf("-%d.\n",inventory.tickTimer);
+		inventory.tickTimer--;
+		inventory.armor += (inventory.level + 1);
+		if (inventory.tickTimer%10==0){
+
+			switch (inventory.level){
+			case 0:
+
+				//break;
+			default:
+				break;
+			}
+
+		}
+	}
+
+
 //	gameLocal.Printf("Moving\n");
 	float newEyeOffset;
 	idVec3 oldOrigin;
@@ -10087,7 +10126,7 @@ void idPlayer::CalcDamagePoints( idEntity *inflictor, idEntity *attacker, const 
 		if (inventory.armor > 0){
 			printf("still have armor");
 			damage = 0;
-			inventory.armor - damage;
+			//inventory.armor - damage;
 		}
 
 	} else {
@@ -14164,7 +14203,7 @@ void idInventory::handleHit(bool landed){
 		countLanded++;
 	}
 
-	if (countHits >= ammoReq){
+	if (countHits >= (unsigned int) ammoReq){
 		if (countLanded > 0){
 			gameLocal.Printf("Don't get cocky kid! \n");
 			score++;
