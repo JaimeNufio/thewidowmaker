@@ -560,7 +560,7 @@ void Cmd_Give_f( const idCmdArgs &args ) {
 void Cmd_Widowmaker_f(const idCmdArgs &args){
 
 	gameLocal.Printf("Widowmaker\n");
-	Cmd_Give_f(args);
+	//Cmd_Give_f(args);
 }
 /*
 ==================
