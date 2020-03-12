@@ -549,10 +549,10 @@ windowDef Desktop
 		}
 		windowDef player_score_jaime
 		{
-			rect	434,449,196,23
+			rect	433,401,196,23
 			visible	1
 			forecolor	1,1,1,1
-			text	"gui::player_score_jaime"
+			text	"gui::player_level_jaime"
 			textscale	0.4
 			font	"fonts/chain"
 			shear	0,-.22
@@ -569,16 +569,16 @@ windowDef Desktop
 			shear	0,-.22
 			textalign	2
 		}
-		windowDef player_level_jaime
+		windowDef player_bar_jaime
 		{
-			rect	434,402,196,23
+			rect	428,371,202,29
 			visible	1
 			forecolor	1,1,1,1
-			text	"gui::player_level_jaime"
-			textscale	0.4
-			font	"fonts/chain"
+			text	"gui::player_bar_jaime"
+			textscale	0.7
+			font	"fonts/strogg"
 			shear	0,-.22
-			textalign	2
+			textalign	1
 		}
 		windowDef player_buffs_jaime
 		{
@@ -599,6 +599,17 @@ windowDef Desktop
 			textscale	0.35
 			font	"fonts/chain"
 			shear	0,-.22
+		}
+		windowDef player_update_jaime
+		{
+			rect	12,333,258,23
+			visible	1
+			forecolor	1,1,1,1
+			text	"gui::player_update_jaime"
+			textscale	0.4
+			font	"fonts/chain"
+			shear	0,-.22
+			textalign	2
 		}
 	}
 	windowDef p_health
@@ -721,12 +732,12 @@ windowDef Desktop
 		}
 		windowDef d_armor_amount
 		{
-			rect	215,426,58,31
+			rect	164,426,109,31
 			visible	0
 		}
 		windowDef armor_amount
 		{
-			rect	217,428,52,26
+			rect	165,428,103,26
 			visible	1
 			forecolor	0.866,0.921,0.764,1
 			text	"gui::player_armor"
@@ -971,7 +982,7 @@ windowDef Desktop
 	}
 	windowDef p_weapswitch
 	{
-		rect	0,350,640,80
+		rect	0,53,640,80
 		visible	0
 		notime	1
 
@@ -2148,7 +2159,7 @@ windowDef Desktop
 	}
 	windowDef fade
 	{
-		rect	-1,0,640,480
+		rect	-2,0,640,480
 		backcolor	0,0,0,0
 		visible	1
 	}

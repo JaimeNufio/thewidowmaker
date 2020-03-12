@@ -233,7 +233,7 @@ stateResult_t rvWeaponLightningGun::State_Fire(const stateParms_t& parms) {
 	case STAGE_INIT:
 		SpinUp();
 		nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
-		Attack(false, 5, 150, 0, 1.0f);
+		Attack(false, 100, 75.0f, 0, 1.0f);
 		if (ClipSize()) {
 			viewModel->SetShaderParm(HYPERBLASTER_SPARM_BATTERY, (float)AmmoInClip() / ClipSize());
 		}
@@ -281,7 +281,7 @@ stateResult_t rvWeaponLightningGun::State_Reload(const stateParms_t& parms) {
 		viewModel->SetShaderParm(HYPERBLASTER_SPARM_BATTERY, 0);
 
 		SetStatus(WP_RELOAD);
-		PlayAnim(ANIMCHANNEL_ALL, "reload", parms.blendFrames);
+	//	PlayAnim(ANIMCHANNEL_ALL, "reload", parms.blendFrames);
 		return SRESULT_STAGE(STAGE_WAIT);
 
 	case STAGE_WAIT:
