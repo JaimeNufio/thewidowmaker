@@ -3,14 +3,8 @@
 
 #include "../Game_local.h"
 #include "../Weapon.h"
-#include "../client/ClientEffect.h"
 
-#ifndef __GAME_PROJECTILE_H__
-#include "../Projectile.h"
-#endif
-
-
-const int NAPALM_GUN_NUM_CYLINDERS = 5;
+const int SHOTGUN_MOD_AMMO = BIT(0);
 
 class WeaponNapalmGun : public rvWeapon {
 public:
@@ -18,43 +12,21 @@ public:
 	CLASS_PROTOTYPE(WeaponNapalmGun);
 
 	WeaponNapalmGun(void);
-	~WeaponNapalmGun(void);
 
 	virtual void			Spawn(void);
-	virtual void			Think(void);
-	virtual void			MuzzleRise(idVec3 &origin, idMat3 &axis);
-
-	virtual void			SpectatorCycle(void);
-
-	void					Save(idSaveGame *saveFile) const;
-	void					Restore(idRestoreGame *saveFile);
+	void					Save(idSaveGame *savefile) const;
+	void					Restore(idRestoreGame *savefile);
+	void					PreSave(void);
+	void					PostSave(void);
 
 protected:
-
-	void					UpdateCylinders(void);
-
-	typedef enum { CYLINDER_RESET_POSITION, CYLINDER_MOVE_POSITION, CYLINDER_UPDATE_POSITION } CylinderState;
-	CylinderState								cylinderState;
+	int						hitscans;
 
 private:
 
 	stateResult_t		State_Idle(const stateParms_t& parms);
 	stateResult_t		State_Fire(const stateParms_t& parms);
 	stateResult_t		State_Reload(const stateParms_t& parms);
-	stateResult_t		State_EmptyReload(const stateParms_t& parms);
-
-	stateResult_t		Frame_MoveCylinder(const stateParms_t& parms);
-	stateResult_t		Frame_ResetCylinder(const stateParms_t& parms);
-
-
-	float								cylinderMaxOffsets[NAPALM_GUN_NUM_CYLINDERS];
-	idInterpolate<float>				cylinderOffsets[NAPALM_GUN_NUM_CYLINDERS];
-	jointHandle_t						cylinderJoints[NAPALM_GUN_NUM_CYLINDERS];
-
-
-	int									cylinderMoveTime;
-	int									previousAmmo;
-	bool								zoomed;
 
 	CLASS_STATES_PROTOTYPE(WeaponNapalmGun);
 };
@@ -67,14 +39,8 @@ END_CLASS
 WeaponNapalmGun::WeaponNapalmGun
 ================
 */
-WeaponNapalmGun::WeaponNapalmGun(void) { }
-
-/*
-================
-WeaponNapalmGun::~WeaponNapalmGun
-================
-*/
-WeaponNapalmGun::~WeaponNapalmGun(void) { }
+WeaponNapalmGun::WeaponNapalmGun(void) {
+}
 
 /*
 ================
@@ -82,150 +48,44 @@ WeaponNapalmGun::Spawn
 ================
 */
 void WeaponNapalmGun::Spawn(void) {
-	assert(viewModel);
-	idAnimator* animator = viewModel->GetAnimator();
-	assert(animator);
+	hitscans = spawnArgs.GetFloat("hitscans");
 
 	SetState("Raise", 0);
-
-	for (int i = 0; i < NAPALM_GUN_NUM_CYLINDERS; ++i)
-	{
-		idStr argName = "cylinder_offset";
-		argName += i;
-		cylinderMaxOffsets[i] = spawnArgs.GetFloat(argName, "0.0");
-
-		argName = "cylinder_joint";
-		argName += i;
-		cylinderJoints[i] = animator->GetJointHandle(spawnArgs.GetString(argName, ""));
-
-		cylinderOffsets[i].Init(gameLocal.time, 0.0f, 0, 0);
-	}
-
-	previousAmmo = AmmoInClip();
-	cylinderMoveTime = spawnArgs.GetFloat("cylinderMoveTime", "500");
-	cylinderState = CYLINDER_RESET_POSITION;
-	zoomed = false;
 }
 
 /*
 ================
-WeaponNapalmGun::Think
-================
-*/
-void WeaponNapalmGun::Think(void) {
-
-	rvWeapon::Think();
-
-	//Check to see if the ammo level has changed.
-	//This is to account for ammo pickups.
-	if (previousAmmo != AmmoInClip()) {
-		// don't do this in MP, the weap script doesn't sync the canisters anyway
-		if (!gameLocal.isMultiplayer) {
-			//change the cylinder state to reflect the new change in ammo.
-			cylinderState = CYLINDER_MOVE_POSITION;
-		}
-		previousAmmo = AmmoInClip();
-	}
-
-	UpdateCylinders();
-}
-
-/*
-===============
-WeaponNapalmGun::MuzzleRise
-===============
-*/
-void WeaponNapalmGun::MuzzleRise(idVec3 &origin, idMat3 &axis) {
-	if (wsfl.zoom)
-		return;
-
-	rvWeapon::MuzzleRise(origin, axis);
-}
-
-/*
-===============
-WeaponNapalmGun::UpdateCylinders
-===============
-*/
-void WeaponNapalmGun::UpdateCylinders(void)
-{
-	idAnimator* animator;
-	animator = viewModel->GetAnimator();
-	assert(animator);
-
-	float ammoInClip = AmmoInClip();
-	float clipSize = ClipSize();
-	if (clipSize <= idMath::FLOAT_EPSILON) {
-		clipSize = maxAmmo;
-	}
-
-	for (int i = 0; i < NAPALM_GUN_NUM_CYLINDERS; ++i)
-	{
-		// move the local position of the joint along the x-axis.
-		float currentOffset = cylinderOffsets[i].GetCurrentValue(gameLocal.time);
-
-		switch (cylinderState)
-		{
-		case CYLINDER_MOVE_POSITION:
-		{
-									   float cylinderMaxOffset = cylinderMaxOffsets[i];
-									   float endValue = cylinderMaxOffset * (1.0f - (ammoInClip / clipSize));
-									   cylinderOffsets[i].Init(gameLocal.time, cylinderMoveTime, currentOffset, endValue);
-		}
-			break;
-
-		case CYLINDER_RESET_POSITION:
-		{
-										float cylinderMaxOffset = cylinderMaxOffsets[i];
-										float endValue = cylinderMaxOffset * (1.0f - (ammoInClip / clipSize));
-										cylinderOffsets[i].Init(gameLocal.time, 0, endValue, endValue);
-		}
-			break;
-		}
-
-
-		animator->SetJointPos(cylinderJoints[i], JOINTMOD_LOCAL, idVec3(currentOffset, 0.0f, 0.0f));
-	}
-
-	cylinderState = CYLINDER_UPDATE_POSITION;
-}
-
-
-/*
-=====================
 WeaponNapalmGun::Save
-=====================
+================
 */
-void WeaponNapalmGun::Save(idSaveGame *saveFile) const
-{
-	for (int i = 0; i < NAPALM_GUN_NUM_CYLINDERS; i++)
-	{
-		saveFile->WriteFloat(cylinderMaxOffsets[i]);
-		saveFile->WriteInterpolate(cylinderOffsets[i]);
-		saveFile->WriteJoint(cylinderJoints[i]);
-	}
-
-	saveFile->WriteInt(cylinderMoveTime);
-	saveFile->WriteInt(previousAmmo);
+void WeaponNapalmGun::Save(idSaveGame *savefile) const {
 }
 
 /*
-=====================
+================
 WeaponNapalmGun::Restore
-=====================
+================
 */
-void WeaponNapalmGun::Restore(idRestoreGame *saveFile) {
-
-	for (int i = 0; i < NAPALM_GUN_NUM_CYLINDERS; i++)
-	{
-		saveFile->ReadFloat(cylinderMaxOffsets[i]);
-		saveFile->ReadInterpolate(cylinderOffsets[i]);
-		saveFile->ReadJoint(cylinderJoints[i]);
-	}
-
-	saveFile->ReadInt(cylinderMoveTime);
-	saveFile->ReadInt(previousAmmo);
+void WeaponNapalmGun::Restore(idRestoreGame *savefile) {
+	hitscans = spawnArgs.GetFloat("hitscans");
 }
+
+/*
+================
+WeaponNapalmGun::PreSave
+================
+*/
+void WeaponNapalmGun::PreSave(void) {
+}
+
+/*
+================
+WeaponNapalmGun::PostSave
+================
+*/
+void WeaponNapalmGun::PostSave(void) {
+}
+
 
 /*
 ===============================================================================
@@ -243,7 +103,7 @@ END_CLASS_STATES
 
 /*
 ================
-rvWeaponShotgun::State_Idle
+WeaponNapalmGun::State_Idle
 ================
 */
 stateResult_t WeaponNapalmGun::State_Idle(const stateParms_t& parms) {
@@ -295,7 +155,7 @@ stateResult_t WeaponNapalmGun::State_Idle(const stateParms_t& parms) {
 
 /*
 ================
-rvWeaponShotgun::State_Fire
+WeaponNapalmGun::State_Fire
 ================
 */
 stateResult_t WeaponNapalmGun::State_Fire(const stateParms_t& parms) {
@@ -307,7 +167,7 @@ stateResult_t WeaponNapalmGun::State_Fire(const stateParms_t& parms) {
 	case STAGE_INIT:
 		nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
 		Attack(false, hitscans, spread, 0, 1.0f);
-		PlayAnim(ANIMCHANNEL_ALL, "fire", 0);
+		//PlayAnim(ANIMCHANNEL_ALL, "fire", 0);
 		return SRESULT_STAGE(STAGE_WAIT);
 
 	case STAGE_WAIT:
@@ -332,7 +192,7 @@ stateResult_t WeaponNapalmGun::State_Fire(const stateParms_t& parms) {
 
 /*
 ================
-rvWeaponShotgun::State_Reload
+WeaponNapalmGun::State_Reload
 ================
 */
 stateResult_t WeaponNapalmGun::State_Reload(const stateParms_t& parms) {
@@ -356,7 +216,7 @@ stateResult_t WeaponNapalmGun::State_Reload(const stateParms_t& parms) {
 
 		SetStatus(WP_RELOAD);
 
-		if (mods & false) {
+		if (mods & true) {
 			PlayAnim(ANIMCHANNEL_ALL, "reload_clip", parms.blendFrames);
 		}
 		else {
@@ -431,16 +291,3 @@ stateResult_t WeaponNapalmGun::State_Reload(const stateParms_t& parms) {
 	return SRESULT_ERROR;
 }
 
-stateResult_t WeaponNapalmGun::Frame_MoveCylinder(const stateParms_t& parms) {
-	cylinderState = CYLINDER_MOVE_POSITION;
-	return SRESULT_OK;
-}
-
-stateResult_t WeaponNapalmGun::Frame_ResetCylinder(const stateParms_t& parms) {
-	cylinderState = CYLINDER_RESET_POSITION;
-	return SRESULT_OK;
-}
-
-void WeaponNapalmGun::SpectatorCycle(void) {
-	cylinderState = CYLINDER_RESET_POSITION;
-}

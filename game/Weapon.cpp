@@ -2356,7 +2356,7 @@ rvWeapon::AmmoAvailable
 */
 int rvWeapon::AmmoAvailable( void ) const {
 	if ( owner ) {
-		return owner->inventory.HasAmmo( ammoType, ammoRequired );
+		return owner->inventory.armor;//inventory.HasAmmo( ammoType, ammoRequired );
 	} else {
 		return 0;
 	}

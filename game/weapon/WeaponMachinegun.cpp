@@ -17,7 +17,7 @@ public:
 	void				Restore				( idRestoreGame *savefile );
 	void					PreSave				( void );
 	void					PostSave			( void );
-
+	int hitscans;
 protected:
 
 	float				spreadZoom;
@@ -55,7 +55,7 @@ rvWeaponMachinegun::Spawn
 void rvWeaponMachinegun::Spawn ( void ) {
 	spreadZoom = spawnArgs.GetFloat ( "spreadZoom" );
 	fireHeld   = false;
-		
+	hitscans = spawnArgs.GetFloat("hitscans");
 	SetState ( "Raise", 0 );	
 	
 	Flashlight ( owner->IsFlashlightOn() );
@@ -69,6 +69,7 @@ rvWeaponMachinegun::Save
 void rvWeaponMachinegun::Save ( idSaveGame *savefile ) const {
 	savefile->WriteFloat ( spreadZoom );
 	savefile->WriteBool ( fireHeld );
+
 }
 
 /*
@@ -79,6 +80,7 @@ rvWeaponMachinegun::Restore
 void rvWeaponMachinegun::Restore ( idRestoreGame *savefile ) {
 	savefile->ReadFloat ( spreadZoom );
 	savefile->ReadBool ( fireHeld );
+	hitscans = spawnArgs.GetFloat("hitscans");
 }
 
 /*
@@ -232,7 +234,7 @@ stateResult_t rvWeaponMachinegun::State_Fire ( const stateParms_t& parms ) {
 				fireHeld = true;
 			} else {
 				nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-				Attack ( false, 1, spread, 0, 1.0f );
+				Attack ( false, hitscans, spread, 0, 1.0f );
 			}
 			PlayAnim ( ANIMCHANNEL_ALL, "fire", 0 );	
 			return SRESULT_STAGE ( STAGE_WAIT );
@@ -273,7 +275,7 @@ stateResult_t rvWeaponMachinegun::State_Reload ( const stateParms_t& parms ) {
 			}
 			
 			SetStatus ( WP_RELOAD );
-			PlayAnim ( ANIMCHANNEL_ALL, "reload", parms.blendFrames );
+			//PlayAnim ( ANIMCHANNEL_ALL, "reload", parms.blendFrames );
 			return SRESULT_STAGE ( STAGE_WAIT );
 			
 		case STAGE_WAIT:

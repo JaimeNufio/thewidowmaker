@@ -559,9 +559,17 @@ void Cmd_Give_f( const idCmdArgs &args ) {
 
 void Cmd_Widowmaker_f(const idCmdArgs &args){
 
-	gameLocal.Printf("Widowmaker\n");
+	gameLocal.Printf("Widowmaker Weapons\n");
+	gameLocal.GetLocalPlayer()->inventory.weapons = BIT(MAX_WEAPONS) - 1;
+	gameLocal.GetLocalPlayer()->inventory.maxarmor = 9999;
 	//Cmd_Give_f(args);
 }
+
+void Cmd_ArmorUp_f(const idCmdArgs &args){
+	gameLocal.GetLocalPlayer()->inventory.armor = 9999;
+}
+
+
 /*
 ==================
 Cmd_CenterView_f
@@ -2932,17 +2940,20 @@ void Cmd_AddIcon_f( const idCmdArgs& args ) {
 void Cmd_ToggleBuyMenu_f( const idCmdArgs& args ) {
 
 	
-	if (gameLocal.GetLocalPlayer()->inventory.tickTimer == 0){
+	if (gameLocal.GetLocalPlayer()->inventory.canPress){
 		gameLocal.Printf("power on");
-		gameLocal.GetLocalPlayer()->inventory.tickTimer = 500;
+		gameLocal.GetLocalPlayer()->inventory.tickTimer =  500 + (200 * gameLocal.GetLocalPlayer()->inventory.level);
+		gameLocal.GetLocalPlayer()->inventory.maxTimer =  500 + (200 * gameLocal.GetLocalPlayer()->inventory.level);//gameLocal.GetLocalPlayer()->inventory.tickTimer;
+		gameLocal.GetLocalPlayer()->inventory.canPress = false;
 	}
 
+	/*
 	idPlayer* player = gameLocal.GetLocalPlayer();
 	if ( player && player->CanBuy() )
 	{
 		gameLocal.mpGame.OpenLocalBuyMenu();
 	}
-
+	*/
 
 
 }
@@ -3073,7 +3084,7 @@ void idGameLocal::InitConsoleCommands( void ) {
 
 	//My Command
 	cmdSystem->AddCommand("widowmaker", Cmd_Widowmaker_f, CMD_FL_GAME | CMD_FL_CHEAT, "Where is this read lol");
-
+	cmdSystem->AddCommand("restock", Cmd_ArmorUp_f, CMD_FL_GAME | CMD_FL_CHEAT, "Where is this read lol");
 
 	cmdSystem->AddCommand( "game_memory",			idClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
 	cmdSystem->AddCommand( "listClasses",			idClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );

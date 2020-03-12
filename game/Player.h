@@ -202,10 +202,18 @@ public:
 	unsigned int countLanded = 0;
 	unsigned int level = 0;
 	unsigned int tickTimer = 0;
+	unsigned int lastPress = 0;
+	unsigned int coolDown = 3; //in seconds
+	unsigned int maxTimer = 100;
+	unsigned int updateText = 0;
+
+	bool canPress = true;
 	float reward = 1.5f;
 	float ammoDiscount = 0;
+	
 
 
+	void handleLevel();
 	void handleHit(bool landed);
 	//////////////////////////////////////////////////////////////
 
