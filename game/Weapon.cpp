@@ -2513,7 +2513,16 @@ rvWeapon::Attack
 void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuseOffset, float power ) {
 	idVec3 muzzleOrigin;
 	idMat3 muzzleAxis;
-	
+
+	if (GetOwner() == gameLocal.GetLocalPlayer() ){
+		gameLocal.Printf("Player fire\n");
+		gameLocal.Printf("|TT: %d|L: %d|\n", gameLocal.GetLocalPlayer()->inventory.tickTimer, gameLocal.GetLocalPlayer()->inventory.level);
+		if (gameLocal.GetLocalPlayer()->inventory.tickTimer >= 5 && gameLocal.GetLocalPlayer()->inventory.level>=3){
+			gameLocal.Printf("| DOUBLE HITS | ");
+			num_attacks *= 2;
+		}
+	}
+
 	if ( !viewModel ) {
 		common->Warning( "NULL viewmodel %s\n", __FUNCTION__ );
 		return;
@@ -2601,6 +2610,12 @@ void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuse
 	if ( !gameLocal.isClient ) {
 		idDict& dict = altAttack ? attackAltDict : attackDict;
 		power *= owner->PowerUpModifier( PMOD_PROJECTILE_DAMAGE );
+
+		if (gameLocal.GetLocalPlayer()->inventory.tickTimer >= 5 && gameLocal.GetLocalPlayer()->inventory.level >= 2){
+			gameLocal.Printf("| BIG BOOM | ");
+			power *= 2;
+		}
+
 		if ( altAttack ? wfl.attackAltHitscan : wfl.attackHitscan ) {
 			Hitscan( dict, muzzleOrigin, muzzleAxis, num_attacks, spread, power );
 		} else {

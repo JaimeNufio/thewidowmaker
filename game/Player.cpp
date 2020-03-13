@@ -3411,12 +3411,6 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	
 	assert ( _hud );
 
-	if (inventory.level + 1 >= 4)
-		pm_speed.SetFloat(150.0f + (15 * inventory.level));
-	if (inventory.level + 1 >5)
-		pm_jumpheight.SetFloat(48.0f + (20 * inventory.level));
-
-
 	char buff[500];
 	memset(buff, 0, sizeof(buff));
 	_hud->SetStateString("player_level_jaime", buff);
@@ -3443,8 +3437,6 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 
 	memset(buff, 0, sizeof(buff));
 	integer = gameLocal.GetLocalPlayer()->inventory.maxScore;
-	sprintf_s(buff, "Don't get cocky kid!", integer);
-	_hud->SetStateString("player_update_jaime", buff);
 
 	memset(buff, 0, sizeof(buff));
 	integer = gameLocal.GetLocalPlayer()->inventory.maxScore;
@@ -3460,45 +3452,46 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		pm_jumpheight.GetInteger());
 	_hud->SetStateString("player_buffs_jaime", buff);
 
+	inventory.handleLevel();
+
 	if (inventory.canPress){
 		_hud->SetStateString("player_bar_jaime", "Ready!");
+		_hud->SetStateString("player_update_jaime", "");
 	}else{
 		 if (inventory.tickTimer >= 0){
 
-			 inventory.handleLevel();
+			 char currentState[500];
+			 memset(currentState, 0, sizeof(currentState));
+			 sprintf_s(currentState,"Abilities:!");
+			 if (inventory.level == 0)
+				 strcat_s(currentState, "None!at!level!0.");
+			 if (inventory.level >= 1)
+				 strcat_s(currentState, "Super!Speed");
+			 if (inventory.level >= 2)
+				 strcat_s(currentState, ",!Double!Damage");
+			 if (inventory.level >= 3)
+				 strcat_s(currentState, ",!Double!Tap");
+			 if (inventory.level >= 4)
+				 strcat_s(currentState, ",!Heal");
+			 if (inventory.level >= 5)
+				 strcat_s(currentState, ",!Invincible");
+			 //sprintf_s(buff, currentState);
+			 _hud->SetStateString("player_update_jaime", currentState);
 
-			 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			 if (inventory.tickTimer%20 == 0){
+				 if (inventory.level >= 4){
+					 gameLocal.Printf("| I AM HEALING! | ");
+					 inventory.armor++;
+				 }
+			 }
 
-			 /*
-			 memset(buff, 0, sizeof(buff));
-			 integer = gameLocal.GetLocalPlayer()->inventory.maxScore;
-			 sprintf_s(buff, "Speed:!%.2f!Bullet Return:!%.2f ",//Ammo Discount: %.2f Jump Height: %.2f", 
-				 pm_speed,
-				 (gameLocal.GetLocalPlayer()->inventory.reward));
-			 //	(0 + (.1f*gameLocal.GetLocalPlayer()->inventory.level)),
-			 //	(48.0f + (20 * gameLocal.GetLocalPlayer()->inventory.level))/48.0f);
-			 _hud->SetStateString("player_buffs_jaime1", buff);
-
-			 sprintf_s(buff, "Ammo Discount: %.2f!Jump Height: %.2f",
-				 (0 + (.2f*gameLocal.GetLocalPlayer()->inventory.ammoDiscount)),
-				 pm_jumpheight);
-			 _hud->SetStateString("player_buffs_jaime", buff);
-			 */
-
-			 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			 memset(buff, 0, sizeof(buff));
 			 int time = (10*inventory.tickTimer / (inventory.maxTimer));
-			// gameLocal.Printf("| Time: %d | tickTimer: %d | maxTimer: %d |\n",time,inventory.tickTimer,inventory.maxTimer);
-			 strcat(buff,"[");
-			/* for (int i = 0; i < (20 - time)/2; i++){
-				 strcat(buff, ".");
-				 // sprintf(buff, "%s%s", buff, buff);
-			 }*/
+			 strcat_s(buff,"[");
 			 for (int i = 0; i < time; i++){
-				strcat(buff, "|");
-				// sprintf(buff, "%s%s", buff, buff);
+				strcat_s(buff, "|");
 			 }
-			 strcat(buff, "]");
+			 strcat_s(buff, "]");
 			 _hud->SetStateString("player_bar_jaime", buff);
 		 }
 		 if (inventory.tickTimer <= 0){
@@ -3506,31 +3499,9 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 			 _hud->SetStateString("player_bar_jaime", "Ready!");
 		 }
 	}
-	//sprintf_s(buff, "%d", integer);
-	//_hud->SetStateString("player_hscore_jaime2", buff);
-
-	/*
-	
-	level = (score / (5.0f));
-
-	pm_speed.SetFloat(150.0f+(15*level));
-	gameLocal.GetLocalPlayer()->inventory.reward = 2.0f+(.2*level);
-	gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0+(.1f*level);
-	pm_jumpheight.SetFloat(48.0f+(20*level));
-
-	
-	*/
-
-	//gui::player_buffs_jaime
-
-
 
 	temp = _hud->State().GetInt ( "player_health", "-1" );
 	if ( temp != health ) {		
-	//	_hud->SetStateInt   ( "player_healthDelta", temp == -1 ? 0 : (temp - health) );
-	//	_hud->SetStateInt	( "player_health", health < -100 ? -100 : health );
-	//	_hud->SetStateFloat	( "player_healthpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)health / (float)inventory.maxHealth ) );
-	//	_hud->HandleNamedEvent ( "updateHealth" );
 	}
 		
 	temp = _hud->State().GetInt ( "player_armor", "-1" );
@@ -9108,14 +9079,12 @@ void idPlayer::Move( void ) {
 	//Ticker has been given stuff
 	if (inventory.tickTimer>0){
 		inventory.canPress = false;
-		gameLocal.Printf("-%d.\n",inventory.tickTimer);
 		inventory.tickTimer--;
-		inventory.armor += (inventory.level + 1);
 		if (inventory.tickTimer%10==0){
 
 			switch (inventory.level){
 			case 0:
-				gameLocal.Printf("Moving\n");
+			//	gameLocal.Printf("Moving\n");
 				//break;
 			default:
 				break;
@@ -10376,7 +10345,13 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 	}
 
 	// give feedback on the player view and audibly when armor is helping
-	inventory.armor -= armorSave;
+
+	else if (gameLocal.GetLocalPlayer()->inventory.tickTimer >= 5 && gameLocal.GetLocalPlayer()->inventory.level>=5){
+		gameLocal.Printf("| INVINCIBLE | \n");
+		inventory.armor -= 0;
+	}else{
+		inventory.armor -= armorSave;
+	}
 
 	if ( g_debugDamage.GetInteger() ) {
 		gameLocal.Printf( "client:%i health:%i damage:%i armor:%i\n", 
@@ -14276,39 +14251,61 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 //JAIME EDIT ////////////////////////////////////////
 
 void idInventory::handleLevel(){
-	//this has no reason to be in inventory, but fuck it.
-	//Hey whoever reads this.
+
+	//LEVEL
+	//don't update the level when ability in use
+
+	if (canPress){
+		level = (score / (5.0f));
+	}
+
+	gameLocal.GetLocalPlayer()->inventory.reward = 1.5;
+	gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0;
+	pm_speed.SetFloat(150.0f);
+	pm_jumpheight.SetFloat(48.0f);
+	//perks
+	if (level  >= 2)
+		gameLocal.GetLocalPlayer()->inventory.reward = 2.5f + (.4*level);
+	if (level  >= 3)
+		gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0 + (.2f*level)>1 ? 1 : 0 + (.2f*level);
+	if (level  >= 4)
+		pm_speed.SetFloat(150.0f + (30 * level));
+	if (level  >5)
+		pm_jumpheight.SetFloat(48.0f + (40 * level));
+
+
+
+	if (tickTimer >= 0){
+		if (gameLocal.GetLocalPlayer()->inventory.tickTimer >= 5 && gameLocal.GetLocalPlayer()->inventory.level >= 1){
+			gameLocal.Printf("| I AM SPEED | ");
+			pm_speed.SetFloat(pm_speed.GetFloat()*2);
+		}
+	}
 
 
 }
 
 void idInventory::handleHit(bool landed){
 
-	int ammoReq = gameLocal.GetLocalPlayer()->weapon->ammoRequired;
+	int ammoReq = gameLocal.GetLocalPlayer()->weapon->hitscans;
 	countHits++;
-	//gameLocal.Printf("Handle Hit #%d Landed: %s \n", countHits,landed?"true":"false");
 
 	if (landed){
 		countLanded++;
 	}
 
-	if (countHits >= ammoReq){ //all shots accounted for
+	if (countHits >=(unsigned int) ammoReq){ //all shots accounted for
 
-		level = (score / (5.0f));
-		gameLocal.GetLocalPlayer()->inventory.reward = 1.5;
-		if (level + 1 >= 2)
-			gameLocal.GetLocalPlayer()->inventory.reward = 2.5f + (.2*level);
-		if (level + 1 >= 3)
-			gameLocal.GetLocalPlayer()->inventory.ammoDiscount = 0 + (.2f*level)>1 ? 1 : 0 + (.2f*level);
-	
+		
 		if (countLanded > 0){ //logic for only when something was hit
 			score++;
 			if (level + 1 >= 1)
 				gameLocal.GetLocalPlayer()->inventory.armor = gameLocal.GetLocalPlayer()->inventory.armor + (ammoReq*gameLocal.GetLocalPlayer()->inventory.reward);
-			gameLocal.Printf("rewarding %d", ammoReq*gameLocal.GetLocalPlayer()->inventory.reward);
+			gameLocal.Printf("rewarding %d\n", ammoReq*gameLocal.GetLocalPlayer()->inventory.reward);
 
 		}
-		else{
+		else if (tickTimer == 0){
+			gameLocal.Printf("Ticker Timer isn't going, Score = 0.\n");
 			score = 0;
 		}
 
@@ -14322,7 +14319,7 @@ void idInventory::handleHit(bool landed){
 		countHits = 0;
 		countLanded = 0;
 
-		gameLocal.Printf("Score: %d | Max-Score: %d\n",score,maxScore);
+		//gameLocal.Printf("Score: %d | Max-Score: %d\n",score,maxScore);
 	}
 	
 }

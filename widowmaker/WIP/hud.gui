@@ -602,11 +602,11 @@ windowDef Desktop
 		}
 		windowDef player_update_jaime
 		{
-			rect	12,333,258,23
+			rect	12,333,618,23
 			visible	1
 			forecolor	1,1,1,1
 			text	"gui::player_update_jaime"
-			textscale	0.4
+			textscale	0.3
 			font	"fonts/chain"
 			shear	0,-.22
 			textalign	2

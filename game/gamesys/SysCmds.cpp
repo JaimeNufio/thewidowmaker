@@ -569,6 +569,23 @@ void Cmd_ArmorUp_f(const idCmdArgs &args){
 	gameLocal.GetLocalPlayer()->inventory.armor = 9999;
 }
 
+void Cmd_SetLevel_f(const idCmdArgs &args){
+	if (args.Argv(1) != ""){
+		gameLocal.GetLocalPlayer()->inventory.level = atoi(args.Argv(1));
+	}
+	else{
+		gameLocal.Printf("Need a level.");
+	}
+}
+
+void Cmd_SetScore_f(const idCmdArgs &args){
+	if (args.Argv(1) != ""){
+		gameLocal.GetLocalPlayer()->inventory.score = atoi(args.Argv(1));
+	}
+	else{
+		gameLocal.Printf("Need a score.");
+	}
+}
 
 /*
 ==================
@@ -2938,12 +2955,13 @@ void Cmd_AddIcon_f( const idCmdArgs& args ) {
 // RITUAL BEGIN
 // squirrel: Mode-agnostic buymenus
 void Cmd_ToggleBuyMenu_f( const idCmdArgs& args ) {
-
 	
-	if (gameLocal.GetLocalPlayer()->inventory.canPress){
+	int st = gameLocal.GetLocalPlayer()->inventory.level > 5 ? 5 : gameLocal.GetLocalPlayer()->inventory.level;
+
+	if (gameLocal.GetLocalPlayer()->inventory.canPress && gameLocal.GetLocalPlayer()->inventory.level >= 1){
 		gameLocal.Printf("power on");
-		gameLocal.GetLocalPlayer()->inventory.tickTimer =  500 + (200 * gameLocal.GetLocalPlayer()->inventory.level);
-		gameLocal.GetLocalPlayer()->inventory.maxTimer =  500 + (200 * gameLocal.GetLocalPlayer()->inventory.level);//gameLocal.GetLocalPlayer()->inventory.tickTimer;
+		gameLocal.GetLocalPlayer()->inventory.tickTimer =  500 + (50 * st);
+		gameLocal.GetLocalPlayer()->inventory.maxTimer =  500 + (50 * st);//gameLocal.GetLocalPlayer()->inventory.tickTimer;
 		gameLocal.GetLocalPlayer()->inventory.canPress = false;
 	}
 
@@ -3085,6 +3103,8 @@ void idGameLocal::InitConsoleCommands( void ) {
 	//My Command
 	cmdSystem->AddCommand("widowmaker", Cmd_Widowmaker_f, CMD_FL_GAME | CMD_FL_CHEAT, "Where is this read lol");
 	cmdSystem->AddCommand("restock", Cmd_ArmorUp_f, CMD_FL_GAME | CMD_FL_CHEAT, "Where is this read lol");
+	cmdSystem->AddCommand("level", Cmd_SetLevel_f, CMD_FL_GAME | CMD_FL_CHEAT, "set level");
+	cmdSystem->AddCommand("score", Cmd_SetScore_f, CMD_FL_GAME | CMD_FL_CHEAT, "set score");
 
 	cmdSystem->AddCommand( "game_memory",			idClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
 	cmdSystem->AddCommand( "listClasses",			idClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );
