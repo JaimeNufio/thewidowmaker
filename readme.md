@@ -1,12 +1,12 @@
-#The Widowmaker Project
+# The Widowmaker Project
 
-##Universal Deliverables
+## Universal Deliverables
 * In Game Visuals showcasing your edits
 * A README with the description of your changes and instructions on how to see them
 * A Shortcut that auto-launches your mod
 * Compiling with no additional Warnings (Quake's original warnings are fine)
 
-##Personal Deliverables
+## Personal Deliverables
 * Replace weapons w/ shotgun variants (10)
 	* Pew Pew - Blaster with more hitscans, even more on charge. (Similar to blaster.)
 	* Extra Spicy - Napalm Launcher, fires multiple blasts. 
@@ -51,3 +51,7 @@
 * drag ./widowmaker into your Quake4 Folder in steamapps.
 * Command `restock` grants the user 10,000 armor
 * Command `score [num]` sets the player's score to [num]
+* Command `give all` is used to grant weapons
+
+### Known Issues
+* When switching into a gun with ammo requirements more than the armor present, game crashes. Work around fix is to refill ammo when it gets too low automatically.
