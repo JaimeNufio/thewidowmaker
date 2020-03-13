@@ -473,6 +473,7 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 	}
 
 	if ( give_all || idStr::Icmp( name, "armor" ) == 0 ) {
+		player->inventory.maxarmor = 2000;
 		player->inventory.armor = player->inventory.maxarmor;
 		if ( !give_all ) {
 			return;

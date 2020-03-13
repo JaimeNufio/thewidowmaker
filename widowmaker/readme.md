@@ -45,3 +45,9 @@
 
 * Health System
 	* Health removed, Armor is now the sole stat that govern's life. Hitscan weapons pull from Armor instead of having their own ammo.
+
+#Install
+
+* drag ./widowmaker into your Quake4 Folder in steamapps.
+* Command `restock` grants the user 10,000 armor
+* Command `score [num]` sets the player's score to [num]

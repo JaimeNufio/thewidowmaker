@@ -3411,6 +3411,10 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	
 	assert ( _hud );
 
+	if (inventory.armor < 100){
+		inventory.armor += 500;
+	}
+
 	char buff[500];
 	memset(buff, 0, sizeof(buff));
 	_hud->SetStateString("player_level_jaime", buff);
